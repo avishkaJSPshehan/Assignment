@@ -68,7 +68,7 @@
         "ඇගයීම",
       ],
       answer: "අවබෝධය",
-    }
+    },
   ];
 
   const views = {
@@ -80,6 +80,7 @@
   const videoEl = document.getElementById("introVideo");
   const unmuteBtn = document.getElementById("unmuteBtn");
   const pauseResumeBtn = document.getElementById("pauseResumeBtn");
+  const skipBtn = document.getElementById("skipBtn");
 
   const progressEl = document.getElementById("progress");
   const questionTextEl = document.getElementById("questionText");
@@ -93,6 +94,7 @@
   let correctCount = 0;
   let timerId = null;
   let timeLeft = 10; // seconds per question
+  let quizStarted = false;
 
   function showLoader(show) {
     if (show) {
@@ -228,6 +230,8 @@
   }
 
   async function startQuizFlow() {
+    if (quizStarted) return;
+    quizStarted = true;
     showLoader(true);
     try {
       questions = await fetchQuestions();
@@ -290,6 +294,21 @@
         videoEl.pause();
         pauseResumeBtn.textContent = "Resume";
       }
+    });
+  }
+
+  if (skipBtn) {
+    skipBtn.addEventListener("click", () => {
+      try {
+        const jump = 30;
+        const target = Math.min(
+          (videoEl.currentTime || 0) + jump,
+          videoEl.duration || Infinity
+        );
+        videoEl.currentTime = target;
+        // keep playing
+        videoEl.play().catch(() => {});
+      } catch {}
     });
   }
 
