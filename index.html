@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz App</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="bg-circles" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <!-- App Wrapper -->
+    <div id="app" class="app">
+      <!-- HOME: Intro Video -->
+      <section id="home" class="view view-active" aria-labelledby="home-title">
+        <div class="container">
+          <h1 id="home-title" class="visually-hidden">Welcome</h1>
+          <div class="card video-card">
+            <video
+              id="introVideo"
+              class="video"
+              src="video.mp4"
+              autoplay
+              playsinline
+              muted
+            ></video>
+            <div class="video-controls">
+              <button
+                id="unmuteBtn"
+                class="btn btn-secondary"
+                aria-label="Unmute video"
+              >
+                Unmute
+              </button>
+              <button
+                id="pauseResumeBtn"
+                class="btn btn-secondary"
+                aria-label="Pause or resume video"
+              >
+                Pause
+              </button>
+            </div>
+            <p class="hint">Video will auto-start the quiz when finished.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOADER between transitions -->
+      <div id="loader" class="loader hidden" role="status" aria-live="polite">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+
+      <!-- QUIZ -->
+      <section id="quiz" class="view" aria-labelledby="quiz-title">
+        <div class="container">
+          <h2 id="quiz-title" class="visually-hidden">Quiz</h2>
+          <div class="card quiz-card">
+            <div class="quiz-header">
+              <div id="progress" class="progress">Question 1</div>
+              <div id="timer" class="timer" aria-live="polite">00:10</div>
+            </div>
+            <div id="questionText" class="question">Question text</div>
+            <div id="options" class="options" role="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULT -->
+      <section id="result" class="view" aria-labelledby="result-title">
+        <div class="container">
+          <h2 id="result-title" class="visually-hidden">Result</h2>
+          <div class="card result-card">
+            <div id="scoreText" class="score-text">Your score: 0/0</div>
+            <button id="goHomeBtn" class="btn">Go Back to Home</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
