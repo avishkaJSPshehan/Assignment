@@ -70,10 +70,16 @@
           <div class="card quiz-card">
             <div class="quiz-header">
               <div id="progress" class="progress">Question 1</div>
-              <div id="timer" class="timer" aria-live="polite">00:10</div>
             </div>
             <div id="questionText" class="question">Question text</div>
             <div id="options" class="options" role="list"></div>
+            <div id="feedback" class="feedback hidden"></div>
+            <div class="quiz-navigation">
+              <button id="prevBtn" class="btn btn-secondary" disabled>
+                Previous
+              </button>
+              <button id="nextBtn" class="btn">Next</button>
+            </div>
           </div>
         </div>
       </section>

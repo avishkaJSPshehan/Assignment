@@ -87,14 +87,15 @@
   const optionsEl = document.getElementById("options");
   const scoreTextEl = document.getElementById("scoreText");
   const goHomeBtn = document.getElementById("goHomeBtn");
-  const timerEl = document.getElementById("timer");
+  const feedbackEl = document.getElementById("feedback");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
 
   let questions = [];
   let currentIndex = 0;
   let correctCount = 0;
-  let timerId = null;
-  let timeLeft = 10; // seconds per question
   let quizStarted = false;
+  let userAnswers = []; // Track user answers for each question
 
   function showLoader(show) {
     if (show) {
@@ -141,75 +142,80 @@
     }`;
     questionTextEl.textContent = q.question;
     optionsEl.innerHTML = "";
+    feedbackEl.classList.add("hidden");
 
-    q.options.forEach((opt) => {
+    q.options.forEach((opt, index) => {
       const btn = document.createElement("button");
       btn.className = "option-btn";
       btn.type = "button";
       btn.textContent = opt;
       btn.setAttribute("role", "listitem");
-      btn.addEventListener("click", () => handleAnswer(opt));
+      btn.addEventListener("click", () => handleAnswer(opt, index));
       optionsEl.appendChild(btn);
     });
 
-    startTimer(10);
+    // Update navigation buttons
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.textContent =
+      currentIndex === questions.length - 1 ? "Finish" : "Next";
   }
 
-  function handleAnswer(selected) {
-    stopTimer();
+  function handleAnswer(selected, optionIndex) {
     const q = questions[currentIndex];
-    if (String(selected) === String(q.answer)) {
-      correctCount += 1;
-    }
-    currentIndex += 1;
+    const isCorrect = String(selected) === String(q.answer);
 
-    // Small delay to give tap feedback
-    setTimeout(nextStep, 120);
-  }
+    // Store user answer
+    userAnswers[currentIndex] = { selected, isCorrect };
 
-  function startTimer(seconds) {
-    timeLeft = seconds;
-    updateTimerDisplay();
-    stopTimer();
-    timerId = setInterval(() => {
-      timeLeft -= 1;
-      updateTimerDisplay();
-      if (timeLeft <= 0) {
-        stopTimer();
-        // timeout counts as wrong, advance
-        currentIndex += 1;
-        setTimeout(nextStep, 80);
+    // Show feedback
+    showFeedback(isCorrect, q.answer, selected);
+
+    // Disable all option buttons
+    const optionBtns = optionsEl.querySelectorAll(".option-btn");
+    optionBtns.forEach((btn, index) => {
+      btn.disabled = true;
+      if (index === optionIndex) {
+        btn.classList.add(isCorrect ? "correct" : "incorrect");
+      } else if (btn.textContent === q.answer) {
+        btn.classList.add("correct-answer");
       }
-    }, 1000);
+    });
   }
 
-  function stopTimer() {
-    if (timerId) {
-      clearInterval(timerId);
-      timerId = null;
+  function showFeedback(isCorrect, correctAnswer, userAnswer) {
+    feedbackEl.classList.remove("hidden");
+    if (isCorrect) {
+      feedbackEl.className = "feedback correct";
+      feedbackEl.textContent = "✓ Correct!";
+    } else {
+      feedbackEl.className = "feedback incorrect";
+      feedbackEl.textContent = `✗ Wrong. Correct answer: ${correctAnswer}`;
     }
   }
 
-  function updateTimerDisplay() {
-    if (!timerEl) return;
-    const mm = String(Math.floor(timeLeft / 60)).padStart(2, "0");
-    const ss = String(timeLeft % 60).padStart(2, "0");
-    timerEl.textContent = `${mm}:${ss}`;
-  }
-
-  function nextStep() {
-    if (currentIndex >= questions.length) {
-      // Done -> show results
+  function nextQuestion() {
+    if (currentIndex < questions.length - 1) {
+      currentIndex++;
+      renderQuestion();
+    } else {
+      // Calculate final score
+      correctCount = userAnswers.filter((answer) => answer.isCorrect).length;
       scoreTextEl.textContent = `Your score: ${correctCount}/${questions.length}`;
       showView("result");
-      return;
     }
-    renderQuestion();
+  }
+
+  function prevQuestion() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion();
+    }
   }
 
   function resetQuizState() {
     currentIndex = 0;
     correctCount = 0;
+    userAnswers = [];
   }
 
   function goHome() {
@@ -310,6 +316,15 @@
         videoEl.play().catch(() => {});
       } catch {}
     });
+  }
+
+  // Navigation buttons
+  if (prevBtn) {
+    prevBtn.addEventListener("click", prevQuestion);
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", nextQuestion);
   }
 
   // Result button
